@@ -17,6 +17,9 @@ public class ClientRouter {
         return RouterFunctions
                 .route(RequestPredicates.GET("/clients")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
-                        clientHandler::getAllClients);
+                        clientHandler::getAllClients)
+                .andRoute(RequestPredicates.GET("/clients/{id}")
+                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
+                        clientHandler::getClientById);
     }
 }
