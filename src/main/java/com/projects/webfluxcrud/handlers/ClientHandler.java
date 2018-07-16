@@ -21,7 +21,10 @@ public class ClientHandler {
 
     public Mono<ServerResponse> getAllClients(ServerRequest request) {
         Flux<ClientModel> clients = this.reactiveCrudRepository.findAll();
-        return ServerResponse.ok().body(clients, ClientModel.class);
+        System.out.println(clients);
+//        return ServerResponse.ok().body(clients, ClientModel.class);
+        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
+                .body(BodyInserters.fromObject("Getting all clients..."));
     }
 
     public Mono<ServerResponse> getClientById(ServerRequest request) {
