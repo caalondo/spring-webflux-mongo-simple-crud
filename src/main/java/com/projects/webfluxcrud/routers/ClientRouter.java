@@ -2,14 +2,18 @@ package com.projects.webfluxcrud.routers;
 
 import com.projects.webfluxcrud.handlers.ClientHandler;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+@ComponentScan("com.projects.webfluxcrud")
 @Configuration
+@EnableWebFlux
 public class ClientRouter {
 
     @Bean
