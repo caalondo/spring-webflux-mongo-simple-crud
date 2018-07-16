@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class ClientHandler {
 
-    private final ReactiveClientRepository reactiveCrudRepository;
+    private final ReactiveClientRepository reactiveClientRepository;
 
-    public ClientHandler (ReactiveClientRepository reactiveCrudRepository) {
-        this.reactiveCrudRepository = reactiveCrudRepository;
+    public ClientHandler (ReactiveClientRepository reactiveClientRepository) {
+        this.reactiveClientRepository = reactiveClientRepository;
     }
 
     public Mono<ServerResponse> getAllClients(ServerRequest request) {
@@ -28,6 +28,9 @@ public class ClientHandler {
     }
 
     public Mono<ServerResponse> getClientById(ServerRequest request) {
+
+        String id = request.pathVariable("id");
+        System.out.println("\n=====> ID: " + id + "\n\n");
 
         return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
                 .body(BodyInserters.fromObject("Getting client by id..."));

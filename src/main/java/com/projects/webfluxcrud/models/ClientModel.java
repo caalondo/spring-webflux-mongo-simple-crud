@@ -1,8 +1,13 @@
 package com.projects.webfluxcrud.models;
 
+import javax.persistence.*;
 
+@Entity
+@Table(name = "clients")
 public class ClientModel {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String name;
     private int age;
