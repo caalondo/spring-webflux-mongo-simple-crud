@@ -1,6 +1,7 @@
 package com.projects.webfluxcrud.models;
 
 
+import org.json.JSONObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -43,5 +44,19 @@ public class ClientModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + this.id + " - Name: " + this.name + " - Email: " + this.email;
+    }
+
+    public JSONObject asJsonObject () {
+        JSONObject clientObj = new JSONObject();
+        clientObj.put("id", this.id);
+        clientObj.put("name", this.name);
+        clientObj.put("age", this.age);
+        clientObj.put("email", this.email);
+        return clientObj;
     }
 }

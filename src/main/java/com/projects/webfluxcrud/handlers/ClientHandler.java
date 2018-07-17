@@ -2,35 +2,72 @@ package com.projects.webfluxcrud.handlers;
 
 import com.projects.webfluxcrud.models.ClientModel;
 import com.projects.webfluxcrud.repositories.ReactiveClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 
 @Component
 public class ClientHandler {
 
-    @Autowired
-    ReactiveClientRepository reactiveClientRepository;
+    private ReactiveClientRepository reactiveClientRepository;
+
+    public ClientHandler(ReactiveClientRepository reactiveClientRepository) {
+        this.reactiveClientRepository = reactiveClientRepository;
+    }
 
     public Mono<ServerResponse> getAllClients(ServerRequest request) {
         Flux<ClientModel> clients = this.reactiveClientRepository.findAll();
-        System.out.println(clients);
-//        return ServerResponse.ok().body(clients, ClientModel.class);
-        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
-                .body(BodyInserters.fromObject("Getting all clients..."));
+
+        JSONObject responseNotFound = new JSONObject();
+        responseNotFound.put("status", HttpStatus.NOT_FOUND.value());
+        responseNotFound.put("message", HttpStatus.NOT_FOUND);
+
+        return clients
+                .collectList()
+                .flatMap(item ->
+                        ServerResponse
+                                .ok()
+                                .body(BodyInserters.fromObject(item)))
+                .switchIfEmpty(
+                        ServerResponse
+                                .status(HttpStatus.NOT_FOUND)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Flux.just(responseNotFound.toString()), String.class));
     }
 
     public Mono<ServerResponse> getClientById(ServerRequest request) {
 
         String id = request.pathVariable("id");
-        System.out.println("\n=====> ID: " + id + "\n\n");
+        Mono<ClientModel> client = this.reactiveClientRepository.findById(id);
 
-        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
-                .body(BodyInserters.fromObject("Getting client by id..."));
+        JSONObject responseNotFound = new JSONObject();
+        responseNotFound.put("status", HttpStatus.NOT_FOUND.value());
+        responseNotFound.put("message", HttpStatus.NOT_FOUND);
+
+        return client
+                .flatMap(item ->
+                        ServerResponse
+                                .ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Mono.just(item), ClientModel.class))
+                .switchIfEmpty(
+                        ServerResponse
+                                .status(HttpStatus.NOT_FOUND)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Mono.just(responseNotFound.toString()), String.class)
+                )
+                .onErrorResume(error ->
+                        ServerResponse
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Mono.just(error.toString()), String.class)
+                );
     }
 }
