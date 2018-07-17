@@ -14,12 +14,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class ClientHandler {
 
-    private final ReactiveClientRepository reactiveClientRepository;
-
     @Autowired
-    public ClientHandler (ReactiveClientRepository reactiveClientRepository) {
-        this.reactiveClientRepository = reactiveClientRepository;
-    }
+    ReactiveClientRepository reactiveClientRepository;
 
     public Mono<ServerResponse> getAllClients(ServerRequest request) {
         Flux<ClientModel> clients = this.reactiveClientRepository.findAll();
