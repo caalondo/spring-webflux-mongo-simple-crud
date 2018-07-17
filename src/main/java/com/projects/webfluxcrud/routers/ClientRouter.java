@@ -11,9 +11,11 @@ import org.springframework.web.reactive.function.server.*;
 public class ClientRouter {
 
     @Bean
-    public RouterFunction<ServerResponse> route(ClientHandler clientHandler) {
+    public RouterFunction<ServerResponse> routes(ClientHandler clientHandler) {
         return RouterFunctions
                 .route(RequestPredicates.GET("/clients").or(RequestPredicates.GET("/clients/")), clientHandler::getAllClients)
-                .andRoute(RequestPredicates.GET("/clients/{id}"), clientHandler::getClientById);
+                .andRoute(RequestPredicates.GET("/clients/{id}"), clientHandler::getClientById)
+                .andRoute(RequestPredicates.POST("/clients"), clientHandler::createClient)
+                .andRoute(RequestPredicates.PUT("/clients"), clientHandler::updateClient);
     }
 }

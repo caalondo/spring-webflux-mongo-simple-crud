@@ -6,12 +6,15 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.swing.text.html.Option;
+import java.util.Optional;
 
 
 @Component
@@ -40,11 +43,15 @@ public class ClientHandler {
                         ServerResponse
                                 .status(HttpStatus.NOT_FOUND)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .body(Flux.just(responseNotFound.toString()), String.class));
+                                .body(Flux.just(responseNotFound.toString()), String.class))
+                .onErrorResume(error ->
+                        ServerResponse
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Mono.just(error.toString()), String.class)
+                );
     }
 
     public Mono<ServerResponse> getClientById(ServerRequest request) {
-
         String id = request.pathVariable("id");
         Mono<ClientModel> client = this.reactiveClientRepository.findById(id);
 
@@ -68,6 +75,34 @@ public class ClientHandler {
                         ServerResponse
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(Mono.just(error.toString()), String.class)
+                );
+    }
+
+    public Mono<ServerResponse> createClient(ServerRequest request) {
+        return request.bodyToMono(ClientModel.class)
+                .flatMap(item -> this.reactiveClientRepository.save(item))
+                .flatMap(item ->
+                        ServerResponse
+                                .status(HttpStatus.CREATED)
+                                .body(Mono.just(item), ClientModel.class))
+                .onErrorResume(error ->
+                        ServerResponse
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Mono.just(error.toString()), String.class)
+                );
+    }
+
+    public Mono<ServerResponse> updateClient(ServerRequest request) {
+        return request.bodyToMono(ClientModel.class)
+                .flatMap(item -> this.reactiveClientRepository.save(item))
+                .flatMap(item ->
+                        ServerResponse
+                                .status(HttpStatus.ACCEPTED)
+                                .body(Mono.just(item), ClientModel.class))
+                .onErrorResume(error ->
+                        ServerResponse
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(Mono.just(error.toString()), String.class)
                 );
     }
 }
