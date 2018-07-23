@@ -16,6 +16,6 @@ public class ClientRouter {
                 .route(RequestPredicates.GET("/clients").or(RequestPredicates.GET("/clients/")), clientHandler::getAllClients)
                 .andRoute(RequestPredicates.GET("/clients/{id}"), clientHandler::getClientById)
                 .andRoute(RequestPredicates.POST("/clients"), clientHandler::createClient)
-                .andRoute(RequestPredicates.PUT("/clients"), clientHandler::updateClient);
+                .andRoute(RequestPredicates.PUT("/clients/{id}"), clientHandler::updateClient);
     }
 }
